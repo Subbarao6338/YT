@@ -230,10 +230,19 @@ font-size:22px;
 text-align:center;
 line-height:35px;
 pointer-events:auto;
+display: flex;
+gap: 5px;
 `);
 setDiv.setAttribute("id","setDiv");
+
+var iconFill = window.location.href.indexOf("watch") < 0 ? c : "#fff";
+
+var notifSvg=document.createElement("ytm-pivot-bar-item-renderer");
+notifSvg.innerHTML=`<svg fill="${ iconFill }" xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24" id="hNotif"><path d="M10 20h4c0 1.1-.9 2-2 2s-2-.9-2-2zm10-2.62V11c0-3.08-1.64-5.64-4.5-6.32V4c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v.68C9.64 5.36 8 7.92 8 11v6.38l-2 2H18l-2-2z"></path></svg>`;
+setDiv.appendChild(notifSvg);
+
 var svg=document.createElement("ytm-pivot-bar-item-renderer");
-svg.innerHTML=`<svg fill="${ window.location.href.indexOf("watch") < 0 ? c : "#fff" }" xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"  id="hSett"><path d="M12.844 1h-1.687a2 2 0 00-1.962 1.616 3 3 0 01-3.92 2.263 2 2 0 00-2.38.891l-.842 1.46a2 2 0 00.417 2.507 3 3 0 010 4.525 2 2 0 00-.417 2.507l.843 1.46a2 2 0 002.38.892 3.001 3.001 0 013.918 2.263A2 2 0 0011.157 23h1.686a2 2 0 001.963-1.615 3.002 3.002 0 013.92-2.263 2 2 0 002.38-.892l.842-1.46a2 2 0 00-.418-2.507 3 3 0 010-4.526 2 2 0 00.418-2.508l-.843-1.46a2 2 0 00-2.38-.891 3 3 0 01-3.919-2.263A2 2 0 0012.844 1Zm-1.767 2.347a6 6 0 00.08-.347h1.687a4.98 4.98 0 002.407 3.37 4.98 4.98 0 004.122.4l.843 1.46A4.98 4.98 0 0018.5 12a4.98 4.98 0 001.716 3.77l-.843 1.46a4.98 4.98 0 00-4.123.4A4.979 4.979 0 0012.843 21h-1.686a4.98 4.98 0 00-2.408-3.371 4.999 4.999 0 00-4.12-.399l-.844-1.46A4.979 4.979 0 005.5 12a4.98 4.98 0 00-1.715-3.77l.842-1.459a4.98 4.98 0 004.123-.399 4.981 4.981 0 002.327-3.025ZM16 12a4 4 0 11-7.999 0 4 4 0 018 0Zm-4 2a2 2 0 100-4 2 2 0 000 4Z"></path></svg>
+svg.innerHTML=`<svg fill="${ iconFill }" xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"  id="hSett"><path d="M12.844 1h-1.687a2 2 0 00-1.962 1.616 3 3 0 01-3.92 2.263 2 2 0 00-2.38.891l-.842 1.46a2 2 0 00.417 2.507 3 3 0 010 4.525 2 2 0 00-.417 2.507l.843 1.46a2 2 0 002.38.892 3.001 3.001 0 013.918 2.263A2 2 0 0011.157 23h1.686a2 2 0 001.963-1.615 3.002 3.002 0 013.92-2.263 2 2 0 002.38-.892l.842-1.46a2 2 0 00-.418-2.507 3 3 0 010-4.526 2 2 0 00.418-2.508l-.843-1.46a2 2 0 00-2.38-.891 3 3 0 01-3.919-2.263A2 2 0 0012.844 1Zm-1.767 2.347a6 6 0 00.08-.347h1.687a4.98 4.98 0 002.407 3.37 4.98 4.98 0 004.122.4l.843 1.46A4.98 4.98 0 0018.5 12a4.98 4.98 0 001.716 3.77l-.843 1.46a4.98 4.98 0 00-4.123.4A4.979 4.979 0 0012.843 21h-1.686a4.98 4.98 0 00-2.408-3.371 4.999 4.999 0 00-4.12-.399l-.844-1.46A4.979 4.979 0 005.5 12a4.98 4.98 0 00-1.715-3.77l.842-1.459a4.98 4.98 0 004.123-.399 4.981 4.981 0 002.327-3.025ZM16 12a4 4 0 11-7.999 0 4 4 0 018 0Zm-4 2a2 2 0 100-4 2 2 0 000 4Z"></path></svg>
 `;
 setDiv.appendChild(svg);
 insertAfter(document.getElementsByTagName("ytm-home-logo")[0],setDiv)
@@ -241,6 +250,12 @@ if(document.getElementById("hSett") != null){
 document.getElementById("hSett").addEventListener("click",
 function(ev){
 window.location.hash="settings";
+});
+}
+if(document.getElementById("hNotif") != null){
+document.getElementById("hNotif").addEventListener("click",
+function(ev){
+window.location.href="https://m.youtube.com/notifications";
 });
 }
 }
@@ -605,13 +620,13 @@ ytpSetI.innerHTML=`<style>
 #ssprodivI div{
 height:10px;
 width:calc(100% - 20px);
-padding:10px;
+	padding:15px 10px;
 font-size:1.45rem;
 text-align:left;
 display:flex;
 align-items:center;
 position:relative;
-margin-top:3px;
+	margin: 5px auto;
 }
 #ssprodivI div span{
 display:block;
@@ -648,7 +663,7 @@ font-size:1.45rem;
 width:calc(100% - 20px);
 height:40px;
 color:${isD ? "#ccc" : "#444"};
-margin-top:3px;
+	margin: 5px auto;
 text-align:left;
 }
 #ssprodivI button svg{
@@ -717,16 +732,6 @@ color:${c};
 ytpSetI.innerHTML+=`<br><b style='font-size:18px' >YT PRO Settings</b>
 <span style="font-size:10px">v${YTProVer}</span>
 <br><br>
-<div data-action="follow" style="min-height:35px;height:auto;width:95%;margin:auto;background:#ee2a7b44;border-radius:30px;margin-bottom:15px;border:1px solid #ee2a7b;display:flex;padding:5px;gap:8px;">
-
-<img style="flex-shrink: 0;height:40px;width:40px;border-radius:50%;" src="https://raw.githubusercontent.com/prateek-chaubey/YTPro/refs/heads/main/.github/img/habitius.webp" >
-<div style="display:flex;flex-direction:column;align-items:flex-start;height:100%;width:auto;flex-shrink:0;font-size:14px;background:re;padding:0;"><b>Please follow Habitius on Instagram</b>For daily habit,lifestyle and health tips </div>
-
-<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="${isD ? "#ccc" : "#444"}" viewBox="0 0 16 16">
-<path fill-rule="evenodd" d="M4.646 1.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1 0 .708l-6 6a.5.5 0 0 1-.708-.708L10.293 8 4.646 2.354a.5.5 0 0 1 0-.708"/>
-</svg>
-
-</div>
 
 <div><input type="url" placeholder="Enter Youtube URL" id="ytproUrlInput" ></div>
 <br>
@@ -778,13 +783,6 @@ ytpSetI.innerHTML+=`<br><b style='font-size:18px' >YT PRO Settings</b>
 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="${isD ? "#ccc" : "#444"}" viewBox="0 0 16 16">
 <path fill-rule="evenodd" d="M4.646 1.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1 0 .708l-6 6a.5.5 0 0 1-.708-.708L10.293 8 4.646 2.354a.5.5 0 0 1 0-.708"/>
 </svg>
-</button>
-<br>
-<button style="font-weight:bolder;" data-action="sponsor">Become a Sponsor
-<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="${isD ? "#ccc" : "#444"}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-  <path d="M5 2l6 6-6 6"/>
-</svg>
-
 </button>
 <br>
 <div>Developer Mode <span data-action="sttCnf" data-value="devMode" style="${sttCnf(0,0,"devMode")}" ><b style="${sttCnf(0,1,"devMode")}"></b></span></div>
@@ -839,9 +837,6 @@ document.getElementById("ytproUrlInput").addEventListener("keyup",searchUrl);
 
 
 var actionsList={
-  follow:()=>{
-    Android.oplink("https://www.instagram.com/habitius.daily");
-  },
   hearts:()=>{
     window.location.hash='#hearts';
   },
@@ -862,9 +857,6 @@ var actionsList={
   },
   disableCodecs:()=>{
     document.getElementsByClassName('disableCodecs')[0].style.display='block';document.getElementsByClassName('disableCodecs')[0].innerHTML=getYTPROCodecs();
-  },
-  sponsor:()=>{
-    Android.oplink('https://github.com/sponsors/prateek-chaubey');
   },
   savePrompt:(el)=>{
     localStorage.setItem('prompt',el.previousElementSibling.value);el.parentElement.style.display='none';

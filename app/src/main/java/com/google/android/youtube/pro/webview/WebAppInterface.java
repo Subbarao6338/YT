@@ -27,6 +27,10 @@ import com.google.android.youtube.pro.R;
 import com.google.android.youtube.pro.utils.DownloadUtils;
 import com.google.android.youtube.pro.utils.MediaMuxerUtils;
 
+import android.app.Notification;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
 import org.json.JSONObject;
 
 public class WebAppInterface {
@@ -252,5 +256,31 @@ public class WebAppInterface {
 		} else {
 			Toast.makeText(activity, activity.getString(R.string.no_pip), Toast.LENGTH_SHORT).show();
 		}
+	}
+
+	@JavascriptInterface
+	public void showNotification(String title, String message) {
+		NotificationManager notificationManager = (NotificationManager) activity.getSystemService(Context.NOTIFICATION_SERVICE);
+		String channelId = "app_notifications";
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+			NotificationChannel channel = new NotificationChannel(channelId, "App Notifications", NotificationManager.IMPORTANCE_DEFAULT);
+			notificationManager.createNotificationChannel(channel);
+		}
+
+		Intent intent = new Intent(activity, MainActivity.class);
+		intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+		PendingIntent pendingIntent = PendingIntent.getActivity(activity, 0, intent, PendingIntent.FLAG_IMMUTABLE);
+
+		Notification.Builder builder = (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) ?
+				new Notification.Builder(activity, channelId) :
+				new Notification.Builder(activity);
+
+		builder.setSmallIcon(R.mipmap.app_icon)
+				.setContentTitle(title)
+				.setContentText(message)
+				.setAutoCancel(true)
+				.setContentIntent(pendingIntent);
+
+		notificationManager.notify((int) System.currentTimeMillis(), builder.build());
 	}
 }

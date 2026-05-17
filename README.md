@@ -13,12 +13,6 @@
 
 </div>
 
-### Become a Sponsor 
----
-> [!TIP]
-> If you like this project, consider [sponsoring](https://github.com/sponsors/prateek-chaubey) to support the author 🌸
----
-
 ## Download YT PRO
 
 [![Download zip](https://custom-icon-badges.herokuapp.com/badge/-Download-ff0000?style=for-the-badge&logo=download&logoColor=white "Download Apk")](https://nightly.link/prateek-chaubey/YTPro/workflows/gradle/main/YTPRO.zip)
@@ -73,12 +67,6 @@ The available variables for gemini prompt are
  * [Sponsor Block](https://github.com/ajayyy/SponsorBlock)
  * [return-youtube-dislike](https://github.com/Anarios/return-youtube-dislike)
  * [YouTube.js](https://github.com/LuanRT/YouTube.js/)
-
-### ❤️Supporters❤️
-[![Stargazers repo roster for @prateek-chaubey/YTPro](http://reporoster.com/stars/dark/prateek-chaubey/YTPro)](https://github.com/prateek-chaubey/YTPro/stargazers)
-     
-[![Forkers repo roster for @prateek-chaubey/YTPro](http://reporoster.com/forks/dark/prateek-chaubey/YTPro)](https://github.com/prateek-chaubey/YTPro/network/members)
-
 
 ## Disclaimer 
 This is an educational project aimed at showcasing javascript injection into a webview to enhance productivity.

@@ -30,3 +30,14 @@ jobs:
       with:
           name: YTPRO
           path: "app/build/outputs/apk/release/youtube_pro_signed.apk"
+
+    - name: Create Release
+      if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+      uses: softprops/action-gh-release@v2
+      with:
+        files: "app/build/outputs/apk/release/youtube_pro_signed.apk"
+        tag_name: v${{ github.run_number }}
+        name: YTPRO v${{ github.run_number }}
+        body: "Automated build of YTPRO."
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

@@ -197,6 +197,9 @@ public class YTProWebViewClient extends WebViewClient {
 			activity.mediaSession = false;
 			activity.stopService(new Intent(activity.getApplicationContext(), ForegroundService.class));
 		}
+		if (activity.swipeRefreshLayout != null) {
+			activity.swipeRefreshLayout.setRefreshing(false);
+		}
 		super.onPageFinished(view, url);
 	}
 }
