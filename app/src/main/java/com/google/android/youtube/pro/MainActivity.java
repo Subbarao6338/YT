@@ -19,6 +19,7 @@ import android.widget.Toast;
 import android.window.OnBackInvokedCallback;
 import android.window.OnBackInvokedDispatcher;
 import android.widget.Button;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 // Import the separated components
 import com.google.android.youtube.pro.webview.YTProWebView;
@@ -38,17 +39,18 @@ public class MainActivity extends Activity {
     public boolean dL = false;
 
     private YTProWebView web;
+    public SwipeRefreshLayout swipeRefreshLayout;
     private MediaCommandReceiver broadcastReceiver;
     private OnBackInvokedCallback backCallback;
     public BinaryStreamManager streamManager;
-    
-    
+
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main);
-        
+
         SharedPreferences prefs = getSharedPreferences("YTPRO", MODE_PRIVATE);
         if (!prefs.contains("bgplay")) {
             prefs.edit().putBoolean("bgplay", true).apply();
@@ -59,18 +61,26 @@ public class MainActivity extends Activity {
     }
 
     public void load(boolean dl) {
-              
-        
+
+
         this.dL = dl;
         web = findViewById(R.id.web);
-        
+        swipeRefreshLayout = findViewById(R.id.swipeRefreshLayout);
+
+        swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                web.reload();
+            }
+        });
+
         web.getSettings().setJavaScriptEnabled(true);
         web.getSettings().setSupportZoom(true);
         web.getSettings().setBuiltInZoomControls(true);
         web.getSettings().setDisplayZoomControls(false);
         web.getSettings().setDomStorageEnabled(true);
         web.getSettings().setDatabaseEnabled(true);
-        web.getSettings().setMediaPlaybackRequiresUserGesture(false); 
+        web.getSettings().setMediaPlaybackRequiresUserGesture(false);
         web.setLayerType(View.LAYER_TYPE_HARDWARE, null);
 
         CookieManager cookieManager = CookieManager.getInstance();
@@ -91,7 +101,7 @@ public class MainActivity extends Activity {
                 url = sharedText;
             }
         }
-        
+
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
           web.getSettings().setMixedContentMode(android.webkit.WebSettings.MIXED_CONTENT_ALWAYS_ALLOW);
         }
@@ -100,18 +110,18 @@ public class MainActivity extends Activity {
         web.addJavascriptInterface(new WebAppInterface(this, web), "Android");
         web.setWebChromeClient(new YTProWebChromeClient(this, web));
         web.setWebViewClient(new YTProWebViewClient(this, web));
-        
+
         web.loadUrl(url);
 
         setupReceiver();
         setupBackNavigation();
         streamManager = new BinaryStreamManager(web,this);
-        
-        
-    }
-         
 
-   
+
+    }
+
+
+
 
     private void setupReceiver() {
         broadcastReceiver = new MediaCommandReceiver(web);
