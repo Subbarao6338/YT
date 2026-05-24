@@ -131,6 +131,24 @@ public class YTProWebViewClient extends WebViewClient {
 		
 		if (url.contains("youtube.com/ytpro_cdn/")) {
 			String modifiedUrl = url;
+
+			if (url.contains("youtube.com/ytpro_cdn/npm/ytpro@latest/bgplay.js") || url.equals("https://youtube.com/ytpro_cdn/npm/ytpro/bgplay.js")) {
+				try {
+					InputStream is = activity.getAssets().open("bgplay.js");
+					return new WebResourceResponse("application/javascript", "UTF-8", is);
+				} catch (Exception e) { }
+			} else if (url.contains("youtube.com/ytpro_cdn/npm/ytpro@latest/innertube.js") || url.equals("https://youtube.com/ytpro_cdn/npm/ytpro/innertube.js")) {
+				try {
+					InputStream is = activity.getAssets().open("innertube.js");
+					return new WebResourceResponse("application/javascript", "UTF-8", is);
+				} catch (Exception e) { }
+			} else if (url.contains("youtube.com/ytpro_cdn/npm/ytpro@latest") || url.equals("https://youtube.com/ytpro_cdn/npm/ytpro")) {
+				try {
+					InputStream is = activity.getAssets().open("script.js");
+					return new WebResourceResponse("application/javascript", "UTF-8", is);
+				} catch (Exception e) { }
+			}
+
 			if (url.contains("youtube.com/ytpro_cdn/esm")) modifiedUrl = url.replace("youtube.com/ytpro_cdn/esm", "esm.sh");
 			else if (url.contains("youtube.com/ytpro_cdn/npm")) modifiedUrl = url.replace("youtube.com/ytpro_cdn", "cdn.jsdelivr.net");
 			

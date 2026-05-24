@@ -20,7 +20,7 @@ if(!YTProVer){
 var YTProVer="3.98";
 var ytoldV="";
 var isF=false;   //what is this for?
-var isAp=false; // oh it's for bg play 
+var isAp=false; // oh it's for bg play
 const originalPause = HTMLMediaElement.prototype.pause; // well long story short , save the original pause function
 window.PIPause = false; // for pausing video when in PIP
 window.isPIP=false;
@@ -345,7 +345,7 @@ try{document.getElementsByClassName('ytProgressBarLineProgressBarLine')[0].appen
 
 
 /*Fetch The Dislikes*/
-async function fDislikes(url){ 
+async function fDislikes(url){
 var Url=new URL(url);
 var vID="";
 if(Url.pathname.indexOf("shorts") > -1){
@@ -448,17 +448,17 @@ document.getElementById("player-control-container").appendChild(sSDiv);
 
 sSDiv.addEventListener("click",(e)=>{
   var el=e.target.closest("[data-action]");
-  
+
   if(!el) return;
   var action=el.dataset.action;
-  
+
   if(action == "close"){
 el.parentElement.parentElement.remove();
   }else if(action == "rewind"){
   el.parentElement.parentElement.remove();
-  document.getElementsByClassName('video-stream')[0].currentTime=sT+1; 
+  document.getElementsByClassName('video-stream')[0].currentTime=sT+1;
   }
-  
+
 });
 
 
@@ -474,7 +474,7 @@ if((window.location.pathname.indexOf("watch") > -1) || (window.location.pathname
 var unV=setInterval(() => {
 
 
-/*Unmute The Video*/ 
+/*Unmute The Video*/
 
 document.getElementsByClassName('video-stream')[0].muted=false;
 
@@ -801,11 +801,11 @@ ytpSetI.innerHTML+=`<br><b style='font-size:18px' >YT PRO Settings</b>
 <br>
 <div>Miniplayer Gesture <span data-action="sttCnf" data-value="gesM" style="${sttCnf(0,0,"gesM")}" ><b style="${sttCnf(0,1,"gesM")}"></b></span></div>
 <br>
-<div>Force Zoom <span data-action="sttCnf" data-value="fzoom"  style="${sttCnf(0,0,"fzoom")}" ><b style="${sttCnf(0,1,"fzoom")}" ></b></span></div> 
+<div>Force Zoom <span data-action="sttCnf" data-value="fzoom"  style="${sttCnf(0,0,"fzoom")}" ><b style="${sttCnf(0,1,"fzoom")}" ></b></span></div>
 <br>
-<div>Background Play <span data-action="sttCnf" data-value="bgplay" style="${sttCnf(0,0,"bgplay")}" ><b style="${sttCnf(0,1,"bgplay")}" ></b></span></div> 
+<div>Background Play <span data-action="sttCnf" data-value="bgplay" style="${sttCnf(0,0,"bgplay")}" ><b style="${sttCnf(0,1,"bgplay")}" ></b></span></div>
 <br>
-<div>Hide Shorts <span data-action="sttCnf" data-value="shorts" style="${sttCnf(0,0,"shorts")}" ><b style="${sttCnf(0,1,"shorts")}" ></b></span></div> 
+<div>Hide Shorts <span data-action="sttCnf" data-value="shorts" style="${sttCnf(0,0,"shorts")}" ><b style="${sttCnf(0,1,"shorts")}" ></b></span></div>
 <br>
 <div>Skip Silence <span data-action="sttCnf" data-value="skipSilence" style="${sttCnf(0,0,"skipSilence")}" ><b style="${sttCnf(0,1,"skipSilence")}" ></b></span></div>
 <br>
@@ -868,7 +868,7 @@ ${localStorage.getItem("prompt")}
 <z style="margin-right:6px">Made with </z>
 
 <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="#fff" viewBox="-1 -1 18 18">
-<path fill-rule="evenodd" d="M8 1.314C12.438-3.248 23.534 4.735 8 15-7.534 4.736 3.562-3.248 8 1.314" 
+<path fill-rule="evenodd" d="M8 1.314C12.438-3.248 23.534 4.735 8 15-7.534 4.736 3.562-3.248 8 1.314"
 stroke="black" ${ !isD ? "stroke-width='1'" : "" } stroke-linejoin="round" stroke-linecap="round"/>
 </svg>
 
@@ -932,7 +932,7 @@ var actionsList={
 //buttons and switches
 ytpSetI.querySelectorAll("[data-action]").forEach(button =>{
   button.addEventListener("click",()=>{
-    
+
     if(button.dataset.action== "sttCnf"){
     actionsList[button.dataset.action](button,button.dataset.value);
     }else{
@@ -946,7 +946,7 @@ ytpSetI.querySelectorAll("[data-action]").forEach(button =>{
 ytpSetI.querySelector(".disableCodecs").addEventListener("click",(e)=>{
   var el = e.target.closest("[data-action]");
   if(!el) return;
-  
+
   actionsList[el.dataset.action](el,el.dataset.value);
 
 })
@@ -956,7 +956,7 @@ ytpSetI.querySelector(".disableCodecs").addEventListener("click",(e)=>{
 ytpSetI.querySelector(".geminiModels").addEventListener("click",(e)=>{
   var el = e.target.closest("[data-action]");
   if(!el) return;
-  
+
   actionsList[el.dataset.action](el,el.dataset.value);
 
 })
@@ -968,13 +968,13 @@ ytpSetI.querySelector(".geminiModels").addEventListener("click",(e)=>{
 
 
 function searchUrl(e){
-  
-  
+
+
 if(e.keyCode === 13 || e === "Enter"){
 
 var url=e.target.value;
 const regex = /(?:https?:\/\/)?(?:www\.|m\.)?(?:youtu\.be\/|youtube(?:-nocookie)?\.com\/(?:(?:watch)?\?(?:.*&)?v(?:i)?=|(?:embed|v|vi|shorts|live)\/))([a-zA-Z0-9_-]{11})/;
-  
+
 const match = url.match(regex);
 var id=match ? match[1] : null;
 if(id){
@@ -1070,7 +1070,7 @@ try{
 document.getElementById("brtS").remove();
 document.getElementById("volS").remove();
 }catch{}
-  
+
 }
 
 if(localStorage.getItem("devMode") == "false"){
@@ -1205,7 +1205,7 @@ if((e.target.className.toString().includes("video-stream") || e.target.className
 if (z > 1.05) {
 var Vv=document.getElementsByClassName('video-stream')[0];
 zoomIn=true;
-scale=Math.max((screen.height / Vv.offsetHeight) , (screen.width / Vv.offsetWidth)); 
+scale=Math.max((screen.height / Vv.offsetHeight) , (screen.width / Vv.offsetWidth));
 addMaxButton();
 } else if (z < 0.95) {
 zoomIn=false;
@@ -1320,14 +1320,14 @@ document.body.appendChild(script2);
 `;
 
 /*
-var script = document.createElement('script'); 
-script.src="//cdn.jsdelivr.net/npm/eruda"; 
+var script = document.createElement('script');
+script.src="//cdn.jsdelivr.net/npm/eruda";
 document.body.appendChild(script);
 script.onload = function () { eruda.init() } ;
 */
 
 
-  
+
 var source = doc.createTextNode(scriptSource);
 script.appendChild(source);
 doc.body.appendChild(script);
@@ -1380,14 +1380,14 @@ player.removeAttribute("ogTop");
 /*JAVA Callback for AccessToken*/
 function callbackSNlM0e(){
 return new Promise(resolve => {
-callbackSNlM0e.resolve = resolve; 
+callbackSNlM0e.resolve = resolve;
 });
 }
 
 /*JAVA Callback for Gemini Response*/
 function callbackGeminiClient(){
 return new Promise(resolve => {
-callbackGeminiClient.resolve = resolve; 
+callbackGeminiClient.resolve = resolve;
 });
 }
 
@@ -1482,7 +1482,7 @@ converter.setFlavor('github');
 let html = modifyTimestamps(converter.makeHtml(text));
 
 
-let thoughtsHtml=(thoughts != null) ? `<button onclick="(this.nextElementSibling.style.height=='auto') ? (this.children[0].style.transform='rotate(-90deg)',this.nextElementSibling.style.height='0') : (this.children[0].style.transform='rotate(90deg)',this.nextElementSibling.style.height='auto');" class="think" >Show Thinking 
+let thoughtsHtml=(thoughts != null) ? `<button onclick="(this.nextElementSibling.style.height=='auto') ? (this.children[0].style.transform='rotate(-90deg)',this.nextElementSibling.style.height='0') : (this.children[0].style.transform='rotate(90deg)',this.nextElementSibling.style.height='auto');" class="think" >Show Thinking
 <svg xmlns="http://www.w3.org/2000/svg" style="transform:rotate(-90deg);margin-left:10px" width="16" height="16" fill="${isD ? "#ccc" : "#444"}" viewBox="0 0 16 16">
 <path fill-rule="evenodd" d="M4.646 1.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1 0 .708l-6 6a.5.5 0 0 1-.708-.708L10.293 8 4.646 2.354a.5.5 0 0 1 0-.708"/>
 </svg></button>
@@ -1565,7 +1565,7 @@ var headers=JSON.stringify({
 "accept": "*/*",
 "accept-language": "en",
 "content-type":"application/x-www-form-urlencoded;charset=UTF-8",
-"x-goog-ext-525001261-jspb": GeminiModels[localStorage.getItem('geminiModel')], 
+"x-goog-ext-525001261-jspb": GeminiModels[localStorage.getItem('geminiModel')],
 "x-same-domain": "1",
 "cookie": secured,
 "Referer": "https://gemini.google.com/",
@@ -1586,9 +1586,9 @@ document.body.appendChild(sd);
 
 
 
-var prompt=localStorage.getItem('prompt').replaceAll("{url}",window.location.href).replaceAll("{videoId}",new URL(window.location.href).searchParams.get("v")).replaceAll("{title}",document.getElementsByClassName('slim-video-metadata-header')[0].textContent.replaceAll("|","").replaceAll("\\","").replaceAll("?","").replaceAll("*","").replaceAll("<","").replaceAll("/","").replaceAll(":","").replaceAll('"',"").replaceAll(">","")); 
+var prompt=localStorage.getItem('prompt').replaceAll("{url}",window.location.href).replaceAll("{videoId}",new URL(window.location.href).searchParams.get("v")).replaceAll("{title}",document.getElementsByClassName('slim-video-metadata-header')[0].textContent.replaceAll("|","").replaceAll("\\","").replaceAll("?","").replaceAll("*","").replaceAll("<","").replaceAll("/","").replaceAll(":","").replaceAll('"',"").replaceAll(">",""));
 //`send me details with timestamps and images related to this youtube com video ${}`;
-// , including all the aspects and scopes with timestamp , add facts in the analysis as well ,Here's the youtube 
+// , including all the aspects and scopes with timestamp , add facts in the analysis as well ,Here's the youtube
 
 
 
@@ -1627,7 +1627,7 @@ if(window.location.href.indexOf("youtube.com/watch") > -1){
 
 
 try{
-var elm=document.getElementsByTagName("dislike-button-view-model")[0].children[0]; 
+var elm=document.getElementsByTagName("dislike-button-view-model")[0].children[0];
 elm.children[0].children[0].style.width="auto";
 elm.children[0].children[0].style.paddingRight="15px";
 
@@ -1636,7 +1636,7 @@ if(!document.getElementById("diskl")){
   diskl.setAttribute("id","diskl");
   diskl.innerHTML=dislikes;
   diskl.style.marginLeft="5px";
-  
+
 insertAfter(elm.getElementsByClassName("yt-spec-button-shape-next__icon")[0],diskl);
 
 }else{
@@ -1646,11 +1646,11 @@ document.getElementById("diskl").innerHTML=dislikes;
 }catch(e){}
 
 
-//Volume and brightness slider 
+//Volume and brightness slider
 try{
 
 if(localStorage.getItem("gesC") == "true"){
-  
+
 
 var v= document.getElementById("player-container-id");
 var rect=v.getBoundingClientRect();
@@ -1663,13 +1663,13 @@ display:"flex",
 "align-items":"center",
 "justify-content":"center",
 position:"absolute",
-top:"16%", 
+top:"16%",
 right:"0px",
 opacity:"0",
 //background:"#a57a"
-};  
-  
-  
+};
+
+
 
 var el=document.createElement("div");
 var elB=document.createElement("div");
@@ -1758,7 +1758,7 @@ el.style.opacity="0";
 }
 
 
-  
+
 }catch(e){
   console.log(e)
 }
@@ -2013,9 +2013,9 @@ ytProHeart(ysHeart);
 
 
 try{
-  
+
   if(document.getElementsByClassName("reel-player-overlay-actions")[0].children[0]){
-  
+
 document.getElementsByClassName("reel-player-overlay-actions")[0].insertBefore(ys,document.getElementsByClassName("reel-player-overlay-actions")[0].children[1]);
 
 ys.appendChild(ysDown);
@@ -2113,14 +2113,14 @@ await new Promise(r => setTimeout(r, 1));
 
 ytproHh.addEventListener("click",(e)=>{
   var el=e.target.closest("[data-action]");
-  
+
   if(!el) return;
   if(el.dataset.action == "navigateInternalYtMweb"){
     navigateInternalYtMweb(el.dataset.id);
   }else if(el.dataset.action == "remHeart"){
     remHeart(el,el.dataset.id);
   }
-  
+
 });
 
 }
@@ -2161,7 +2161,7 @@ var vid=(new URLSearchParams(window.location.search)).get('v') || window.locatio
 
 var video=document.getElementsByClassName('video-stream')[0];
 var canvas = document.createElement('canvas');
-canvas.style.width = "1600px"; 
+canvas.style.width = "1600px";
 canvas.style.height = "900px";
 canvas.style.background="black";
 var context = canvas.getContext('2d');
@@ -2241,7 +2241,7 @@ function removePIP(){
 isPIP=false;
 pauseAllowed = true;
 document.exitFullscreen();
- 
+
 document.getElementsByClassName('video-stream')[0].pause();
 setTimeout(()=>{
 document.getElementsByClassName('video-stream')[0].play();
@@ -2254,10 +2254,10 @@ document.getElementsByClassName('video-stream')[0].play();
 
 
 function PIPlayer(pip = false){
-  
+
 var v=document.getElementsByClassName('video-stream')[0];
 
- 
+
 if(pip){
 
 if(v.getBoundingClientRect().height > v.getBoundingClientRect().width){
@@ -2301,7 +2301,7 @@ isPIP=true;
 // to allow the pip mode for the video element , like chromium browsers
 
 HTMLMediaElement.prototype.pause = function(){
-  
+
 if (pauseAllowed || PIPause) {
 return originalPause.apply(this, arguments);
 }
@@ -2579,7 +2579,7 @@ try{
 if(zoomIn){
 Ve.style.transform=`scale(${scale})`;
 }else{
-Ve.style.transform="scale(1)";  
+Ve.style.transform="scale(1)";
 }
 }catch{}
 
@@ -2597,8 +2597,8 @@ Ve.style.transform="scale(1)";
 async function extraSpeed(){
   var el=document.querySelector(".ytwVariableSpeedControllerViewModelButtonContainer");
  if(!el) return;
- 
- 
+
+
 const slider = document.getElementById("slider");
 
 if(slider.max==10) return;
@@ -2659,8 +2659,8 @@ const observer = new MutationObserver(() => {
 pkc();
 
 //speed
-extraSpeed(); 
-  
+extraSpeed();
+
 //ads Block
 adsBlock();
 
@@ -2724,15 +2724,15 @@ x.addEventListener("click",(e)=>{
   var el=e.target.closest("[data-action]");
   if(!el) return;
   var action=el.dataset.action;
-  
+
   if(action == "url"){
     Android.oplink('https://github.com/prateek-chaubey/YTPRO/releases');
   }else if(action == "download"){
-    Android.downvid('YTPRO.zip','https://nightly.link/prateek-chaubey/YTPro/workflows/gradle/main/YTPRO.zip','application/zip');  
+    Android.downvid('YTPRO.zip','https://nightly.link/prateek-chaubey/YTPro/workflows/gradle/main/YTPRO.zip','application/zip');
   }else if(action =="cancel"){
     el.parentElement.parentElement.parentElement.remove();
   }
-  
+
 })
 
 document.body.appendChild(x);
@@ -2742,7 +2742,7 @@ document.body.appendChild(x);
 
 
 
-window.onload = function(){ 
+window.onload = function(){
 if(parseFloat(Android.getInfo()) < parseFloat(YTProVer) && (window.location.href == "https://m.youtube.com/" || window.location.href == "https://m.youtube.com") ){
 updateModel();
 }
@@ -2769,7 +2769,7 @@ const url=new URL(anchor.href).searchParams.get("q");
 setTimeout(()=>{Android.oplink(url)},50);
 
 event.preventDefault();
-event.stopPropagation(); 
+event.stopPropagation();
 
 }
 

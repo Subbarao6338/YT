@@ -73,20 +73,31 @@ public class MediaMuxerUtils {
                 }
 
                 // ── Set data sources ──────────────────────────────────────────
-                // Both video and audio files were written by our app.
-                // On API 29+ they physically exist on disk even though created
-                // via MediaStore, so getAbsolutePath() works fine for MediaExtractor.
-                try {
-                    videoExtractor.setDataSource(videoFile.getAbsolutePath());
-                } catch (Exception e) {
-                    throw new Exception("Failed to read video file: " + e.getMessage());
-                }
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                    ContentResolver resolver = context.getContentResolver();
+                    Uri videoUri = getUriForFile(context, videoFile.getName());
+                    if (videoUri != null) {
+                        try (ParcelFileDescriptor videoPfd = resolver.openFileDescriptor(videoUri, "r")) {
+                            videoExtractor.setDataSource(videoPfd.getFileDescriptor());
+                        }
+                    } else {
+                        videoExtractor.setDataSource(videoFile.getAbsolutePath());
+                    }
 
-                if (audioFile != null && audioFile.exists()) {
-                    try {
+                    if (audioFile != null) {
+                        Uri audioUri = getUriForFile(context, audioFile.getName());
+                        if (audioUri != null) {
+                            try (ParcelFileDescriptor audioPfd = resolver.openFileDescriptor(audioUri, "r")) {
+                                audioExtractor.setDataSource(audioPfd.getFileDescriptor());
+                            }
+                        } else {
+                             audioExtractor.setDataSource(audioFile.getAbsolutePath());
+                        }
+                    }
+                } else {
+                    videoExtractor.setDataSource(videoFile.getAbsolutePath());
+                    if (audioFile != null && audioFile.exists()) {
                         audioExtractor.setDataSource(audioFile.getAbsolutePath());
-                    } catch (Exception e) {
-                        throw new Exception("Failed to read audio file: " + e.getMessage());
                     }
                 }
 
@@ -232,32 +243,35 @@ public class MediaMuxerUtils {
         }).start();
     }
 
+    private static Uri getUriForFile(Context context, String fileName) {
+        Uri collection = MediaStore.Downloads.getContentUri("external");
+        String[] projection = {MediaStore.Downloads._ID};
+        String selection = MediaStore.Downloads.DISPLAY_NAME + " = ?";
+        String[] args = {fileName};
+
+        try (Cursor cursor = context.getContentResolver().query(
+                collection, projection, selection, args, null)) {
+            if (cursor != null && cursor.moveToFirst()) {
+                long id = cursor.getLong(
+                        cursor.getColumnIndexOrThrow(MediaStore.Downloads._ID));
+                return Uri.withAppendedPath(collection, String.valueOf(id));
+            }
+        } catch (Exception e) {
+            Log.e(TAG, "Failed to query MediaStore: " + e.getMessage());
+        }
+        return null;
+    }
+
     // Deletes a file correctly for the current API level
     private static void deleteFile(Context context, File file) {
-        if (!file.exists()) return;
-
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-            // Query MediaStore for the Uri of this file by display name
-            Uri collection = MediaStore.Downloads.getContentUri("external");
-            String[] projection = {MediaStore.Downloads._ID};
-            String selection = MediaStore.Downloads.DISPLAY_NAME + " = ?";
-            String[] args = {file.getName()};
-
-            try (Cursor cursor = context.getContentResolver().query(
-                    collection, projection, selection, args, null)) {
-                if (cursor != null && cursor.moveToFirst()) {
-                    long id = cursor.getLong(
-                            cursor.getColumnIndexOrThrow(MediaStore.Downloads._ID));
-                    Uri uri = Uri.withAppendedPath(collection, String.valueOf(id));
-                    context.getContentResolver().delete(uri, null, null);
-                    Log.d(TAG, "Deleted via MediaStore: " + file.getName());
-                }
-            } catch (Exception e) {
-                Log.e(TAG, "Failed to delete via MediaStore: " + e.getMessage());
+            Uri uri = getUriForFile(context, file.getName());
+            if (uri != null) {
+                context.getContentResolver().delete(uri, null, null);
+                Log.d(TAG, "Deleted via MediaStore: " + file.getName());
             }
         } else {
-            // API 21-28
-            file.delete();
+            if (file.exists()) file.delete();
         }
     }
 
