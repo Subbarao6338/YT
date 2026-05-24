@@ -53,7 +53,7 @@ public class MainActivity extends Activity {
 
         SharedPreferences prefs = getSharedPreferences("YTPRO", MODE_PRIVATE);
         if (!prefs.contains("bgplay")) {
-            prefs.edit().putBoolean("bgplay", true).apply();
+            prefs.edit().putBoolean("bgplay", false).apply();
         }
 
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
