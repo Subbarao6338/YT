@@ -8,8 +8,8 @@ android {
         applicationId "com.google.android.youtube.pro"
         minSdkVersion 21
         targetSdkVersion 36
-        versionCode 1
-        versionName "3.98"
+        versionCode System.getenv("GITHUB_RUN_NUMBER")?.toInteger() ?: 1
+        versionName "3.98." + (System.getenv("GITHUB_RUN_NUMBER") ?: "0")
     }
 
     buildTypes {

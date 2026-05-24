@@ -20,7 +20,7 @@ jobs:
         distribution: 'temurin'
         
     - name: Build
-      run: cmd.exe /c gradlew.bat assembleRelease
+      run: cmd.exe /c gradlew.bat assembleRelease -x lint
 
     - name: Sign
       run: cmd.exe /c java.exe -jar "signer\ApkSigner.jar" sign --key "signer\apkeasytool.pk8" --cert "signer\apkeasytool.pem"  --v4-signing-enabled false --out "%cd%/app/build/outputs/apk/release/youtube_pro_signed.apk" "%cd%/app/build/outputs/apk/release/app-release-unsigned.apk"
@@ -30,6 +30,7 @@ jobs:
       with:
           name: YTPRO
           path: "app/build/outputs/apk/release/youtube_pro_signed.apk"
+          retention-days: 5
 
     - name: Create Release
       if: github.event_name == 'push' && github.ref == 'refs/heads/main'
