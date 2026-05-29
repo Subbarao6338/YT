@@ -26,7 +26,7 @@ window.PIPause = false; // for pausing video when in PIP
 window.isPIP=false;
 window.pauseAllowed = true; // allow pause by default
 var sTime=[];
-var webUrls=["m.youtube.com","youtube.com","yout.be","accounts.google.com"];
+var webUrls=["m.youtube.com","youtube.com","yout.be","accounts.google.com","music.youtube.com"];
 var GeminiAT="";
 var GeminiModels = {
     "3.0 Pro": '[1,null,null,null,"9d8ca3786ebdfbea",null,null,0,[4],null,null,1]',
@@ -247,7 +247,15 @@ var svg=document.createElement("ytm-pivot-bar-item-renderer");
 svg.innerHTML=`<svg fill="${ iconFill }" xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"  id="hSett"><path d="M12.844 1h-1.687a2 2 0 00-1.962 1.616 3 3 0 01-3.92 2.263 2 2 0 00-2.38.891l-.842 1.46a2 2 0 00.417 2.507 3 3 0 010 4.525 2 2 0 00-.417 2.507l.843 1.46a2 2 0 002.38.892 3.001 3.001 0 013.918 2.263A2 2 0 0011.157 23h1.686a2 2 0 001.963-1.615 3.002 3.002 0 013.92-2.263 2 2 0 002.38-.892l.842-1.46a2 2 0 00-.418-2.507 3 3 0 010-4.526 2 2 0 00.418-2.508l-.843-1.46a2 2 0 00-2.38-.891 3 3 0 01-3.919-2.263A2 2 0 0012.844 1Zm-1.767 2.347a6 6 0 00.08-.347h1.687a4.98 4.98 0 002.407 3.37 4.98 4.98 0 004.122.4l.843 1.46A4.98 4.98 0 0018.5 12a4.98 4.98 0 001.716 3.77l-.843 1.46a4.98 4.98 0 00-4.123.4A4.979 4.979 0 0012.843 21h-1.686a4.98 4.98 0 00-2.408-3.371 4.999 4.999 0 00-4.12-.399l-.844-1.46A4.979 4.979 0 005.5 12a4.98 4.98 0 00-1.715-3.77l.842-1.459a4.98 4.98 0 004.123-.399 4.981 4.981 0 002.327-3.025ZM16 12a4 4 0 11-7.999 0 4 4 0 018 0Zm-4 2a2 2 0 100-4 2 2 0 000 4Z"></path></svg>
 `;
 setDiv.appendChild(svg);
-insertAfter(document.getElementsByTagName("ytm-home-logo")[0],setDiv)
+var header = document.querySelector('ytm-home-logo, ytmusic-logo, ytmusic-nav-bar, .ytmusic-nav-bar, #header-bar');
+if (header) {
+    insertAfter(header, setDiv);
+} else {
+    document.body.prepend(setDiv);
+    setDiv.style.position = "fixed";
+    setDiv.style.top = "10px";
+    setDiv.style.left = "10px";
+}
 if(document.getElementById("hSett") != null){
 document.getElementById("hSett").addEventListener("click",
 function(ev){
@@ -838,6 +846,8 @@ ytpSetI.innerHTML+=`<br><b style='font-size:18px' >YT PRO Settings</b>
 </button>
 <br>
 <div>Developer Mode <span data-action="sttCnf" data-value="devMode" style="${sttCnf(0,0,"devMode")}" ><b style="${sttCnf(0,1,"devMode")}"></b></span></div>
+<br>
+<div>Sleep Timer (min) <input type="number" id="sleepTimerMin" style="width:50px;margin-left:10px;height:25px;border-radius:5px;border:1px solid ${c};background:${d};color:${c};" min="1" value="30"> <button data-action="startSleepTimer" style="width:auto;height:30px;padding:0 10px;background:${c};color:${dc};border-radius:15px;margin-left:5px;">Start</button></div>
 <br><br>
 <p style="font-size:1.25rem;width:calc(100% - 20px);margin:auto;text-align:left"><b style="font-weight:bold">Disclaimer</b>: This is an educational project aimed at showcasing javascript injection into a webview to enhance productivity.<br>
 You can find the source code at <a href="https://www.youtube.com/redirect?q=https://github.com/prateek-chaubey/YTPRO" style="font-family:monospace;" > https://github.com/prateek-chaubey/YTPRO</a>
@@ -921,6 +931,16 @@ var actionsList={
   },
   block_60fps:(el)=>{
     sttCnf(el,"block_60fps");
+  },
+  startSleepTimer:()=>{
+    var min = document.getElementById("sleepTimerMin").value;
+    if(min > 0){
+        Android.showToast("Sleep timer set for " + min + " minutes");
+        setTimeout(()=>{
+            pauseVideo();
+            Android.showToast("Sleep timer expired. Playback paused.");
+        }, min * 60 * 1000);
+    }
   },
   saveModel:(el,value)=>{
     localStorage.removeItem('geminiChatInfo');
@@ -1513,6 +1533,7 @@ ${html}
 
 /*Main Gemini Function*/
 async function geminiInfo(){
+if (window.location.hostname === 'music.youtube.com') return;
 if(document.getElementById("GeminiResponse") == null){
 var GeminiRes=document.createElement("div");
 GeminiRes.setAttribute("style",`min-height:80px;max-height:400px;display:block;height:auto;overflow:scroll;font-weight:400;width:calc(92% - 20px);font-size:14px;padding:10px;position:relative;margin:auto;background:${d};border-radius:15px;margin-bottom:8px;`);
@@ -2378,11 +2399,11 @@ const url = (typeof input === 'string') ? input : input.url;
 
 
 //block ad urls
-if(url.includes("googleads.g.doubleclick.net") || url.includes("youtube.com/youtubei/v1/player/ad_break") || url.includes("youtube.com/pagead/adview") || url.includes("youtube.com/api/stats/ads")){
+if(url.includes("googleads.g.doubleclick.net") || url.includes("/youtubei/v1/player/ad_break") || url.includes("/pagead/adview") || url.includes("/api/stats/ads")){
 
 //console.log("Blocked",url);
 return "";
-}else if(url.includes("youtube.com/youtubei/")){
+}else if(url.includes("/youtubei/")){
 
 
 const response = await _origFetch.apply(this, arguments);
@@ -2466,9 +2487,9 @@ XHR.prototype.send = function(body) {
 // Block certain URLs
 if (
 this._interceptedUrl.includes("googleads.g.doubleclick.net") ||
-this._interceptedUrl.includes("youtube.com/youtubei/v1/player/ad_break") ||
-this._interceptedUrl.includes("youtube.com/pagead/adview") ||
-this._interceptedUrl.includes("youtube.com/api/stats/ads")
+this._interceptedUrl.includes("/youtubei/v1/player/ad_break") ||
+this._interceptedUrl.includes("/pagead/adview") ||
+this._interceptedUrl.includes("/api/stats/ads")
 ) {
 //console.warn("Blocked:", this._interceptedUrl);
 return;

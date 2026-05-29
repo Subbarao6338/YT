@@ -20,12 +20,24 @@ import android.window.OnBackInvokedDispatcher
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.MusicNote
+import androidx.compose.material.icons.filled.VideoLibrary
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
@@ -43,6 +55,7 @@ open class MainActivity : ComponentActivity() {
     @JvmField var mediaSession: Boolean = false
     @JvmField var isPip: Boolean = false
     @JvmField var dL: Boolean = false
+    var isYouTubeMusic: Boolean = false
 
     lateinit var web: YTProWebView
     var swipeRefreshLayout: SwipeRefreshLayout? = null
@@ -68,16 +81,47 @@ open class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
                 ) {
-                    YoutubeContent()
+                    MainScreen()
                 }
             }
         }
     }
 
+    @OptIn(ExperimentalMaterial3Api::class)
     @Composable
-    fun YoutubeContent() {
+    fun MainScreen() {
+        var isMusicPlatform by remember { mutableStateOf(isYouTubeMusic) }
+
+        Scaffold(
+            topBar = {
+                TopAppBar(
+                    title = { Text(if (isMusicPlatform) "YouTube Music" else "YouTube Pro") },
+                    actions = {
+                        IconButton(onClick = {
+                            isMusicPlatform = !isMusicPlatform
+                            isYouTubeMusic = isMusicPlatform
+                            val targetUrl = if (isYouTubeMusic) "https://music.youtube.com/" else "https://m.youtube.com/"
+                            if (::web.isInitialized) {
+                                web.loadUrl(targetUrl)
+                            }
+                        }) {
+                            Icon(
+                                imageVector = if (isMusicPlatform) Icons.Default.VideoLibrary else Icons.Default.MusicNote,
+                                contentDescription = "Toggle Platform"
+                            )
+                        }
+                    }
+                )
+            }
+        ) { paddingValues ->
+            YoutubeContent(modifier = Modifier.padding(paddingValues))
+        }
+    }
+
+    @Composable
+    fun YoutubeContent(modifier: Modifier = Modifier) {
         AndroidView(
-            modifier = Modifier.fillMaxSize(),
+            modifier = modifier.fillMaxSize(),
             factory = { context ->
                 SwipeRefreshLayout(context).apply {
                     id = View.generateViewId()
@@ -130,7 +174,16 @@ open class MainActivity : ComponentActivity() {
 
         web.addJavascriptInterface(WebAppInterface(this, web), "Android")
         web.webChromeClient = YTProWebChromeClient(this, web)
-        web.webViewClient = YTProWebViewClient(this, web)
+        web.webViewClient = object : YTProWebViewClient(this, web) {
+            override fun onPageStarted(view: android.webkit.WebView?, url: String?, favicon: android.graphics.Bitmap?) {
+                super.onPageStarted(view, url, favicon)
+                if (url?.contains("music.youtube.com") == true) {
+                    web.settings.userAgentString = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36"
+                } else {
+                    web.settings.userAgentString = null // Reset to default
+                }
+            }
+        }
     }
 
     fun load(dl: Boolean) {
@@ -140,7 +193,7 @@ open class MainActivity : ComponentActivity() {
         val intent = intent
         val action = intent.action
         val data = intent.data
-        var url = "https://m.youtube.com/"
+        var url = if (isYouTubeMusic) "https://music.youtube.com/" else "https://m.youtube.com/"
         if (Intent.ACTION_VIEW == action && data != null) {
             url = data.toString()
         } else if (Intent.ACTION_SEND == action) {
