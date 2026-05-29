@@ -17,7 +17,7 @@ var script = document.createElement('script'); script.src="//youtube.com/ytpro_c
 if(!YTProVer){
 
 /*Few Stupid Inits*/
-var YTProVer="3.98";
+var YTProVer=Android.getInfo();
 var ytoldV="";
 var isAp=false; // oh it's for bg play
 const originalPause = HTMLMediaElement.prototype.pause; // well long story short , save the original pause function
@@ -482,12 +482,13 @@ var unV=setInterval(() => {
 
 
 /*Unmute The Video*/
+_videoStream = _videoStream || document.getElementsByClassName('video-stream')[0];
+if (_videoStream) {
+    _videoStream.muted=false;
 
-document.getElementsByClassName('video-stream')[0].muted=false;
-
-if(!document.getElementsByClassName('video-stream')[0].muted){
-clearInterval(unV);
-
+    if(!_videoStream.muted){
+        clearInterval(unV);
+    }
 }
 
 }, 5);
@@ -1535,7 +1536,7 @@ async function geminiInfo(){
 if (window.location.hostname === 'music.youtube.com') return;
 if(document.getElementById("GeminiResponse") == null){
 var GeminiRes=document.createElement("div");
-GeminiRes.setAttribute("style",`min-height:80px;max-height:400px;display:block;height:auto;overflow:scroll;font-weight:400;width:calc(92% - 20px);font-size:14px;padding:10px;position:relative;margin:auto;background:${d};border-radius:15px;margin-bottom:8px;`);
+GeminiRes.setAttribute("style",`min-height:80px;max-height:400px;display:block;height:auto;overflow:scroll;font-weight:400;width:calc(92% - 20px);font-size:14px;padding:10px;position:relative;margin:auto;background:${d};border-radius:15px;margin-bottom:8px;border:1px solid ${isD ? "#444" : "#ccc"};`);
 GeminiRes.setAttribute("id","GeminiResponse");
 
 
@@ -1641,6 +1642,9 @@ var brtSvg=`<svg xmlns="http://www.w3.org/2000/svg" enable-background="new 0 0 2
 
 
 /*THE 0NE AND 0NLY FUNCTION*/
+var _diskl = null;
+var _videoStream = null;
+
 async function pkc(){
 
 if(window.location.href.indexOf("youtube.com/watch") > -1){
@@ -1651,16 +1655,17 @@ var elm=document.getElementsByTagName("dislike-button-view-model")[0].children[0
 elm.children[0].children[0].style.width="auto";
 elm.children[0].children[0].style.paddingRight="15px";
 
-if(!document.getElementById("diskl")){
+_diskl = _diskl || document.getElementById("diskl");
+if(!_diskl){
   var diskl=document.createElement("span");
   diskl.setAttribute("id","diskl");
   diskl.innerHTML=dislikes;
   diskl.style.marginLeft="5px";
 
 insertAfter(elm.getElementsByClassName("yt-spec-button-shape-next__icon")[0],diskl);
-
+_diskl = diskl;
 }else{
-document.getElementById("diskl").innerHTML=dislikes;
+_diskl.innerHTML=dislikes;
 }
 
 }catch(e){}
@@ -1881,6 +1886,8 @@ width:100%;
 display:block;
 float:none;
 clear:both;
+line-height: 1.6;
+font-family: sans-serif;
 }
 #GeminiResponse .think{
 background:transparent;
@@ -2398,10 +2405,10 @@ const url = (typeof input === 'string') ? input : input.url;
 
 
 //block ad urls
-if(url.includes("googleads.g.doubleclick.net") || url.includes("/youtubei/v1/player/ad_break") || url.includes("/pagead/adview") || url.includes("/api/stats/ads")){
+if(url.includes("googleads.g.doubleclick.net") || url.includes("/youtubei/v1/player/ad_break") || url.includes("/pagead/adview") || url.includes("/api/stats/ads") || url.includes("/api/stats/ads") || url.includes("pubads.g.doubleclick.net")){
 
 //console.log("Blocked",url);
-return "";
+return new Response(null, { status: 204 });
 }else if(url.includes("/youtubei/")){
 
 

@@ -40,8 +40,13 @@ object GeminiWrapper {
 
             val responseCode = connection.responseCode
             if (responseCode != HttpURLConnection.HTTP_OK) {
-                Log.e("GeminiWrapper", "HTTP error in getStream: $responseCode")
-                return JSONObject().apply { put("error", "HTTP error $responseCode") }
+                val errorStream = connection.errorStream
+                val errorMessage = errorStream?.bufferedReader()?.use { it.readText() } ?: "No error details"
+                Log.e("GeminiWrapper", "HTTP error in getStream: $responseCode - $errorMessage")
+                return JSONObject().apply {
+                    put("error", "HTTP error $responseCode")
+                    put("details", errorMessage)
+                }
             }
 
             readResponse(connection)
@@ -87,7 +92,9 @@ object GeminiWrapper {
 
             val responseCode = connection.responseCode
             if (responseCode != HttpURLConnection.HTTP_OK) {
-                Log.e("GeminiWrapper", "HTTP error in getSNlM0e: $responseCode")
+                val errorStream = connection.errorStream
+                val errorMessage = errorStream?.bufferedReader()?.use { it.readText() } ?: "No error details"
+                Log.e("GeminiWrapper", "HTTP error in getSNlM0e: $responseCode - $errorMessage")
                 return "error"
             }
 

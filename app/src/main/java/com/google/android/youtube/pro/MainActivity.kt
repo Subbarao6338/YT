@@ -1,5 +1,6 @@
 package com.google.android.youtube.pro
 
+import android.Manifest
 import android.app.Activity
 import android.app.PictureInPictureParams
 import android.content.Intent
@@ -15,10 +16,11 @@ import android.view.View
 import android.view.WindowManager
 import android.webkit.CookieManager
 import android.widget.Toast
-import android.window.OnBackInvokedCallback
-import android.window.OnBackInvokedDispatcher
 import androidx.activity.ComponentActivity
+import androidx.activity.compose.BackHandler
+import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.compose.setContent
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
@@ -33,13 +35,12 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.viewinterop.AndroidView
+import androidx.core.content.ContextCompat
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.google.android.youtube.pro.receivers.MediaCommandReceiver
 import com.google.android.youtube.pro.webview.BinaryStreamManager
@@ -55,13 +56,15 @@ open class MainActivity : ComponentActivity() {
     @JvmField var mediaSession: Boolean = false
     @JvmField var isPip: Boolean = false
     @JvmField var dL: Boolean = false
-    var isYouTubeMusic: Boolean = false
+    var isYouTubeMusic by mutableStateOf(false)
 
     lateinit var web: YTProWebView
     var swipeRefreshLayout: SwipeRefreshLayout? = null
     private var broadcastReceiver: MediaCommandReceiver? = null
-    private var backCallback: OnBackInvokedCallback? = null
     @JvmField var streamManager: BinaryStreamManager? = null
+
+    var requestMicPermission: (() -> Unit)? = null
+    var requestStoragePermission: (() -> Unit)? = null
 
     private val isWebViewInitialized = mutableStateOf(false)
 
@@ -90,23 +93,39 @@ open class MainActivity : ComponentActivity() {
     @OptIn(ExperimentalMaterial3Api::class)
     @Composable
     fun MainScreen() {
-        var isMusicPlatform by remember { mutableStateOf(isYouTubeMusic) }
+        val micLauncher = rememberLauncherForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted ->
+            if (isGranted) {
+                if (::web.isInitialized) web.loadUrl("https://m.youtube.com")
+            } else {
+                Toast.makeText(applicationContext, getString(R.string.grant_mic), Toast.LENGTH_SHORT).show()
+            }
+        }
+
+        val storageLauncher = rememberLauncherForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { results ->
+            if (results.values.any { !it }) {
+                Toast.makeText(applicationContext, getString(R.string.grant_storage), Toast.LENGTH_SHORT).show()
+            }
+        }
 
         Scaffold(
             topBar = {
                 TopAppBar(
-                    title = { Text(if (isMusicPlatform) "YouTube Music" else "YouTube Pro") },
+                    title = { Text(if (isYouTubeMusic) "YouTube Music" else "YouTube Pro") },
                     actions = {
                         IconButton(onClick = {
-                            isMusicPlatform = !isMusicPlatform
-                            isYouTubeMusic = isMusicPlatform
+                            isYouTubeMusic = !isYouTubeMusic
                             val targetUrl = if (isYouTubeMusic) "https://music.youtube.com/" else "https://m.youtube.com/"
                             if (::web.isInitialized) {
+                                if (isYouTubeMusic) {
+                                    web.settings.userAgentString = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36"
+                                } else {
+                                    web.settings.userAgentString = null
+                                }
                                 web.loadUrl(targetUrl)
                             }
                         }) {
                             Icon(
-                                imageVector = if (isMusicPlatform) Icons.Default.VideoLibrary else Icons.Default.MusicNote,
+                                imageVector = if (isYouTubeMusic) Icons.Default.VideoLibrary else Icons.Default.MusicNote,
                                 contentDescription = "Toggle Platform"
                             )
                         }
@@ -114,12 +133,29 @@ open class MainActivity : ComponentActivity() {
                 )
             }
         ) { paddingValues ->
-            YoutubeContent(modifier = Modifier.padding(paddingValues))
+            YoutubeContent(
+                modifier = Modifier.padding(paddingValues),
+                onMicRequest = { micLauncher.launch(Manifest.permission.RECORD_AUDIO) },
+                onStorageRequest = {
+                    storageLauncher.launch(arrayOf(Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.READ_EXTERNAL_STORAGE))
+                }
+            )
         }
     }
 
     @Composable
-    fun YoutubeContent(modifier: Modifier = Modifier) {
+    fun YoutubeContent(
+        modifier: Modifier = Modifier,
+        onMicRequest: () -> Unit,
+        onStorageRequest: () -> Unit
+    ) {
+        this.requestMicPermission = onMicRequest
+        this.requestStoragePermission = onStorageRequest
+
+        BackHandler(enabled = ::web.isInitialized && web.canGoBack()) {
+            web.goBack()
+        }
+
         AndroidView(
             modifier = modifier.fillMaxSize(),
             factory = { context ->
@@ -141,7 +177,6 @@ open class MainActivity : ComponentActivity() {
                     setupWebView()
                     load(dL || intent.action == "com.google.android.youtube.pro.DOWNLOAD")
                     setupReceiver()
-                    setupBackNavigation()
                     streamManager = BinaryStreamManager(web, this@MainActivity)
                     isWebViewInitialized.value = true
                 }
@@ -215,44 +250,6 @@ open class MainActivity : ComponentActivity() {
         }
     }
 
-    private fun setupBackNavigation() {
-        if (Build.VERSION.SDK_INT >= 33) {
-            val dispatcher = onBackInvokedDispatcher
-            backCallback = OnBackInvokedCallback { handleBackPress() }
-            dispatcher.registerOnBackInvokedCallback(OnBackInvokedDispatcher.PRIORITY_DEFAULT, backCallback!!)
-        }
-    }
-
-    private fun handleBackPress() {
-        if (::web.isInitialized && web.canGoBack()) {
-            web.goBack()
-        } else {
-            finish()
-        }
-    }
-
-    @Deprecated("Deprecated in Java")
-    override fun onBackPressed() {
-        @Suppress("DEPRECATION")
-        handleBackPress()
-    }
-
-    @Deprecated("Deprecated in Java")
-    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<String>, grantResults: IntArray) {
-        @Suppress("DEPRECATION")
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-        if (requestCode == 101) {
-            if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                if (::web.isInitialized) web.loadUrl("https://m.youtube.com")
-            } else {
-                Toast.makeText(applicationContext, getString(R.string.grant_mic), Toast.LENGTH_SHORT).show()
-            }
-        } else if (requestCode == 1) {
-            if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_DENIED) {
-                Toast.makeText(applicationContext, getString(R.string.grant_storage), Toast.LENGTH_SHORT).show()
-            }
-        }
-    }
 
     override fun onPictureInPictureModeChanged(isInPictureInPictureMode: Boolean, newConfig: Configuration) {
         if (::web.isInitialized) web.evaluateJavascript(if (isInPictureInPictureMode) "PIPlayer();" else "removePIP();", null)
@@ -285,9 +282,6 @@ open class MainActivity : ComponentActivity() {
         super.onDestroy()
         stopService(Intent(applicationContext, ForegroundService::class.java))
         if (broadcastReceiver != null) unregisterReceiver(broadcastReceiver)
-        if (Build.VERSION.SDK_INT >= 33 && backCallback != null) {
-            onBackInvokedDispatcher.unregisterOnBackInvokedCallback(backCallback!!)
-        }
         streamManager?.cleanup()
     }
 }

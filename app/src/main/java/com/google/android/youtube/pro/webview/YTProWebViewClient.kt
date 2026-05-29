@@ -62,18 +62,11 @@ open class YTProWebViewClient(private val activity: MainActivity, private val we
 
                 val inputStream = if (connection.responseCode >= 400) connection.errorStream else connection.inputStream
                 inputStream?.use { stream ->
-                    val reader = BufferedReader(InputStreamReader(stream))
-                    val html = StringBuilder()
-                    var line: String?
-                    while (reader.readLine().also { line = it } != null) {
-                        var modifiedLine = line
-                        if (modifiedLine?.lowercase()?.contains("content-security-policy") == true) {
-                            modifiedLine = modifiedLine!!.replace("<meta.*?http-equiv=[\"']?Content-Security-Policy[\"']?.*?>".toRegex(), "")
-                        }
-                        html.append(modifiedLine).append("\n")
-                    }
+                    val html = stream.bufferedReader().use { it.readText() }
+                    val cspPattern = "(?i)<meta\\s+[^>]*http-equiv\\s*=\\s*[\"']?Content-Security-Policy[\"']?[^>]*>".toRegex()
+                    val modifiedHtml = html.replace(cspPattern, "")
 
-                    val modifiedHtmlStream = ByteArrayInputStream(html.toString().toByteArray(Charsets.UTF_8))
+                    val modifiedHtmlStream = ByteArrayInputStream(modifiedHtml.toByteArray(Charsets.UTF_8))
                     return WebResourceResponse("text/html", "utf-8", connection.responseCode, "OK", safeHeaders, modifiedHtmlStream)
                 }
                 return super.shouldInterceptRequest(view, request)
