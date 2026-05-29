@@ -6,6 +6,8 @@ import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.os.Build
 import android.view.View
+import android.view.WindowInsets
+import android.view.WindowInsetsController
 import android.view.WindowManager
 import android.webkit.PermissionRequest
 import android.webkit.WebChromeClient
@@ -55,7 +57,22 @@ class YTProWebChromeClient(private val activity: MainActivity, private val web: 
 
         mCustomViewCallback = viewCallback
         (activity.window.decorView as FrameLayout).addView(mCustomView, FrameLayout.LayoutParams(-1, -1))
-        activity.window.decorView.systemUiVisibility = 3846
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            activity.window.setDecorFitsSystemWindows(false)
+            activity.window.insetsController?.let { controller ->
+                controller.hide(WindowInsets.Type.statusBars() or WindowInsets.Type.navigationBars())
+                controller.systemBarsBehavior = WindowInsetsController.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
+            }
+        } else {
+            @Suppress("DEPRECATION")
+            activity.window.decorView.systemUiVisibility = (View.SYSTEM_UI_FLAG_FULLSCREEN
+                    or View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
+                    or View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY
+                    or View.SYSTEM_UI_FLAG_LAYOUT_STABLE
+                    or View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
+                    or View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION)
+        }
     }
 
     override fun onHideCustomView() {
@@ -68,7 +85,14 @@ class YTProWebChromeClient(private val activity: MainActivity, private val web: 
 
         (activity.window.decorView as FrameLayout).removeView(mCustomView)
         mCustomView = null
-        activity.window.decorView.systemUiVisibility = mOriginalSystemUiVisibility
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            activity.window.setDecorFitsSystemWindows(true)
+            activity.window.insetsController?.show(WindowInsets.Type.statusBars() or WindowInsets.Type.navigationBars())
+        } else {
+            @Suppress("DEPRECATION")
+            activity.window.decorView.systemUiVisibility = mOriginalSystemUiVisibility
+        }
 
         // 3. Set the activity BACK to the orientation saved right after going full screen (Portrait)
         activity.requestedOrientation = mOriginalOrientation

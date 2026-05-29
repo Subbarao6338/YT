@@ -60,8 +60,9 @@ class YTProWebViewClient(private val activity: MainActivity, private val web: YT
                     }
                 }
 
-                connection.inputStream.use { inputStream ->
-                    val reader = BufferedReader(InputStreamReader(inputStream))
+                val inputStream = if (connection.responseCode >= 400) connection.errorStream else connection.inputStream
+                inputStream?.use { stream ->
+                    val reader = BufferedReader(InputStreamReader(stream))
                     val html = StringBuilder()
                     var line: String?
                     while (reader.readLine().also { line = it } != null) {
@@ -75,7 +76,7 @@ class YTProWebViewClient(private val activity: MainActivity, private val web: YT
                     val modifiedHtmlStream = ByteArrayInputStream(html.toString().toByteArray(Charsets.UTF_8))
                     return WebResourceResponse("text/html", "utf-8", connection.responseCode, "OK", safeHeaders, modifiedHtmlStream)
                 }
-
+                return super.shouldInterceptRequest(view, request)
             } catch (e: Exception) {
                 return super.shouldInterceptRequest(view, request)
             }
@@ -103,10 +104,11 @@ class YTProWebViewClient(private val activity: MainActivity, private val web: YT
                 headers["Access-Control-Allow-Headers"] = "*"
                 headers["Cross-Origin-Resource-Policy"] = "cross-origin"
 
+                val inputStream = if (conn.responseCode >= 400) conn.errorStream else conn.inputStream
                 return WebResourceResponse(
                     mimeType, encoding,
                     conn.responseCode, "OK",
-                    headers, conn.inputStream
+                    headers, inputStream
                 )
 
             } catch (e: Exception) {
@@ -172,7 +174,8 @@ class YTProWebViewClient(private val activity: MainActivity, private val web: YT
                     return WebResourceResponse("text/plain", "UTF-8", 204, "No Content", headers, null)
                 }
 
-                return WebResourceResponse(mimeType, encoding, connection.responseCode, "OK", headers, connection.inputStream)
+                val inputStream = if (connection.responseCode >= 400) connection.errorStream else connection.inputStream
+                return WebResourceResponse(mimeType, encoding, connection.responseCode, "OK", headers, inputStream)
             } catch (e: Exception) {
                 return super.shouldInterceptRequest(view, request)
             }
