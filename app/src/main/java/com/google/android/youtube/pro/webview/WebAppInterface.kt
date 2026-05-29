@@ -95,9 +95,9 @@ class WebAppInterface(private val activity: MainActivity, private val web: YTPro
                     1
                 )
             }
-            return (activity.checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_DENIED || activity.checkSelfPermission(
+            return (activity.checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED && activity.checkSelfPermission(
                 Manifest.permission.READ_EXTERNAL_STORAGE
-            ) == PackageManager.PERMISSION_DENIED)
+            ) == PackageManager.PERMISSION_GRANTED)
         }
         return true
     }

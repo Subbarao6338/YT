@@ -35,7 +35,6 @@ class ForegroundService : Service() {
 
     private fun initMediaSession() {
         mediaSession = MediaSession(applicationContext, "YTPROMediaSession").apply {
-            setFlags(MediaSession.FLAG_HANDLES_MEDIA_BUTTONS or MediaSession.FLAG_HANDLES_TRANSPORT_CONTROLS)
             setCallback(object : MediaSession.Callback() {
                 override fun onPlay() {
                     super.onPlay()
@@ -146,6 +145,7 @@ class ForegroundService : Service() {
         val builder = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             Notification.Builder(this, CHANNEL_ID)
         } else {
+            @Suppress("DEPRECATION")
             Notification.Builder(this)
         }
 
@@ -161,15 +161,31 @@ class ForegroundService : Service() {
             .setOngoing(action == "play")
             .setOnlyAlertOnce(true)
             .setStyle(mediaStyle)
-            .addAction(R.drawable.ic_skip_previous_white, "Previous", prevPendingIntent)
+            .addAction(
+                Notification.Action.Builder(
+                    R.drawable.ic_skip_previous_white, "Previous", prevPendingIntent
+                ).build()
+            )
 
         if (action == "play") {
-            builder.addAction(R.drawable.ic_pause_white, "Pause", pausePendingIntent)
+            builder.addAction(
+                Notification.Action.Builder(
+                    R.drawable.ic_pause_white, "Pause", pausePendingIntent
+                ).build()
+            )
         } else {
-            builder.addAction(R.drawable.ic_play_arrow_white, "Play", playPendingIntent)
+            builder.addAction(
+                Notification.Action.Builder(
+                    R.drawable.ic_play_arrow_white, "Play", playPendingIntent
+                ).build()
+            )
         }
 
-        builder.addAction(R.drawable.ic_skip_next_white, "Next", nextPendingIntent)
+        builder.addAction(
+            Notification.Action.Builder(
+                R.drawable.ic_skip_next_white, "Next", nextPendingIntent
+            ).build()
+        )
 
         val notification = builder.build()
         if (action == "play") {
@@ -178,6 +194,7 @@ class ForegroundService : Service() {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
                 stopForeground(STOP_FOREGROUND_DETACH)
             } else {
+                @Suppress("DEPRECATION")
                 stopForeground(false)
             }
             notificationManager?.notify(1, notification)
