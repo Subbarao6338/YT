@@ -16,7 +16,7 @@ import java.io.InputStreamReader
 import java.net.URL
 import javax.net.ssl.HttpsURLConnection
 
-class YTProWebViewClient(private val activity: MainActivity, private val web: YTProWebView) : WebViewClient() {
+open class YTProWebViewClient(private val activity: MainActivity, private val web: YTProWebView) : WebViewClient() {
 
     override fun shouldInterceptRequest(view: WebView, request: WebResourceRequest): WebResourceResponse? {
         val url = request.url.toString()
@@ -33,7 +33,7 @@ class YTProWebViewClient(private val activity: MainActivity, private val web: YT
             return super.shouldInterceptRequest(view, request)
         }
 
-        if (request.isForMainFrame && (url.contains("m.youtube.com") || url.contains("www.youtube.com"))) {
+        if (request.isForMainFrame && (url.contains("m.youtube.com") || url.contains("www.youtube.com") || url.contains("music.youtube.com"))) {
             try {
                 val newUrl = URL(url)
                 val connection = newUrl.openConnection() as HttpsURLConnection

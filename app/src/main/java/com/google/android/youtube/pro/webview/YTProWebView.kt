@@ -5,7 +5,7 @@ import android.util.AttributeSet
 import android.view.View
 import android.webkit.WebView
 
-class YTProWebView : WebView {
+open class YTProWebView : WebView {
 
     constructor(context: Context) : super(context)
     constructor(context: Context, attrs: AttributeSet?) : super(context, attrs)
