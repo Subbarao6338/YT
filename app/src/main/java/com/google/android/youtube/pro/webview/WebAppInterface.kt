@@ -85,19 +85,13 @@ class WebAppInterface(private val activity: MainActivity, private val web: YTPro
     @JavascriptInterface
     fun hasStoragePermission(): Boolean {
         if (Build.VERSION.SDK_INT > 22 && Build.VERSION.SDK_INT < Build.VERSION_CODES.R) {
-            if (activity.checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_DENIED || activity.checkSelfPermission(
-                    Manifest.permission.READ_EXTERNAL_STORAGE
-                ) == PackageManager.PERMISSION_DENIED
-            ) {
-                activity.runOnUiThread { Toast.makeText(activity, R.string.grant_storage, Toast.LENGTH_SHORT).show() }
-                activity.requestPermissions(
-                    arrayOf(Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.READ_EXTERNAL_STORAGE),
-                    1
-                )
+            val hasWrite = activity.checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED
+            val hasRead = activity.checkSelfPermission(Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED
+            if (!hasWrite || !hasRead) {
+                activity.runOnUiThread { activity.requestStoragePermission?.invoke() }
+                return false
             }
-            return (activity.checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED && activity.checkSelfPermission(
-                Manifest.permission.READ_EXTERNAL_STORAGE
-            ) == PackageManager.PERMISSION_GRANTED)
+            return true
         }
         return true
     }

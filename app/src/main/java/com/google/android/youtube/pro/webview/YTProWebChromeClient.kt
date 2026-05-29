@@ -113,7 +113,7 @@ class YTProWebChromeClient(private val activity: MainActivity, private val web: 
     override fun onPermissionRequest(request: PermissionRequest) {
         if (Build.VERSION.SDK_INT > 22 && request.origin.toString().contains("youtube.com")) {
             if (activity.checkSelfPermission(Manifest.permission.RECORD_AUDIO) == PackageManager.PERMISSION_DENIED) {
-                activity.requestPermissions(arrayOf(Manifest.permission.RECORD_AUDIO), 101)
+                activity.runOnUiThread { activity.requestMicPermission?.invoke() }
             } else {
                 request.grant(request.resources)
             }
