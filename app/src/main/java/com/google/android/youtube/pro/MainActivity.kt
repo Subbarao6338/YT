@@ -158,6 +158,7 @@ open class MainActivity : ComponentActivity() {
         web.settings.builtInZoomControls = true
         web.settings.displayZoomControls = false
         web.settings.domStorageEnabled = true
+        @Suppress("DEPRECATION")
         web.settings.databaseEnabled = true
         web.settings.mediaPlaybackRequiresUserGesture = false
         web.setLayerType(View.LAYER_TYPE_HARDWARE, null)

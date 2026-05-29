@@ -284,6 +284,7 @@ class WebAppInterface(private val activity: MainActivity, private val web: YTPro
         val builder = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             Notification.Builder(activity, channelId)
         } else {
+            @Suppress("DEPRECATION")
             Notification.Builder(activity)
         }
 

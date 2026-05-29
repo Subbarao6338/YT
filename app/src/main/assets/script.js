@@ -19,7 +19,6 @@ if(!YTProVer){
 /*Few Stupid Inits*/
 var YTProVer="3.98";
 var ytoldV="";
-var isF=false;   //what is this for?
 var isAp=false; // oh it's for bg play
 const originalPause = HTMLMediaElement.prototype.pause; // well long story short , save the original pause function
 window.PIPause = false; // for pausing video when in PIP
@@ -2674,36 +2673,34 @@ el.appendChild(elm);
 const targetNode = document.body;
 const config = { childList: true, subtree: true };
 
+let mutationTimeout;
 const observer = new MutationObserver(() => {
+    if (mutationTimeout) clearTimeout(mutationTimeout);
+    mutationTimeout = setTimeout(() => {
+        //pkc logic
+        pkc();
 
-//pkc logic
-pkc();
+        //speed
+        extraSpeed();
 
-//speed
-extraSpeed();
+        //ads Block
+        adsBlock();
 
-//ads Block
-adsBlock();
+        //mE button
+        addMaxButton();
 
+        //settingsTab
+        addSettingsTab();
 
-//mE button
-addMaxButton();
-
-//settingsTab
-addSettingsTab();
-
-
-try{
-var video = document.getElementsByClassName('video-stream')[0];
-if(video.getBoundingClientRect().height > video.getBoundingClientRect().width){
-Android.fullScreen(true);
-}
-else{
-Android.fullScreen(false);
-}}
-catch{}
-
-
+        try {
+            var video = document.getElementsByClassName('video-stream')[0];
+            if (video && video.getBoundingClientRect().height > video.getBoundingClientRect().width) {
+                Android.fullScreen(true);
+            } else {
+                Android.fullScreen(false);
+            }
+        } catch (e) {}
+    }, 250); // Debounce by 250ms
 });
 
 // Start observing changes in the body

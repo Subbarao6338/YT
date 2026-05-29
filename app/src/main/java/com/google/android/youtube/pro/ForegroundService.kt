@@ -5,6 +5,7 @@ import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.PendingIntent
 import android.app.Service
+import android.graphics.drawable.Icon
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
@@ -162,29 +163,57 @@ class ForegroundService : Service() {
             .setOnlyAlertOnce(true)
             .setStyle(mediaStyle)
             .addAction(
-                Notification.Action.Builder(
-                    R.drawable.ic_skip_previous_white, "Previous", prevPendingIntent
-                ).build()
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                    Notification.Action.Builder(
+                        Icon.createWithResource(this, R.drawable.ic_skip_previous_white), "Previous", prevPendingIntent
+                    ).build()
+                } else {
+                    @Suppress("DEPRECATION")
+                    Notification.Action.Builder(
+                        R.drawable.ic_skip_previous_white, "Previous", prevPendingIntent
+                    ).build()
+                }
             )
 
         if (action == "play") {
             builder.addAction(
-                Notification.Action.Builder(
-                    R.drawable.ic_pause_white, "Pause", pausePendingIntent
-                ).build()
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                    Notification.Action.Builder(
+                        Icon.createWithResource(this, R.drawable.ic_pause_white), "Pause", pausePendingIntent
+                    ).build()
+                } else {
+                    @Suppress("DEPRECATION")
+                    Notification.Action.Builder(
+                        R.drawable.ic_pause_white, "Pause", pausePendingIntent
+                    ).build()
+                }
             )
         } else {
             builder.addAction(
-                Notification.Action.Builder(
-                    R.drawable.ic_play_arrow_white, "Play", playPendingIntent
-                ).build()
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                    Notification.Action.Builder(
+                        Icon.createWithResource(this, R.drawable.ic_play_arrow_white), "Play", playPendingIntent
+                    ).build()
+                } else {
+                    @Suppress("DEPRECATION")
+                    Notification.Action.Builder(
+                        R.drawable.ic_play_arrow_white, "Play", playPendingIntent
+                    ).build()
+                }
             )
         }
 
         builder.addAction(
-            Notification.Action.Builder(
-                R.drawable.ic_skip_next_white, "Next", nextPendingIntent
-            ).build()
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                Notification.Action.Builder(
+                    Icon.createWithResource(this, R.drawable.ic_skip_next_white), "Next", nextPendingIntent
+                ).build()
+            } else {
+                @Suppress("DEPRECATION")
+                Notification.Action.Builder(
+                    R.drawable.ic_skip_next_white, "Next", nextPendingIntent
+                ).build()
+            }
         )
 
         val notification = builder.build()

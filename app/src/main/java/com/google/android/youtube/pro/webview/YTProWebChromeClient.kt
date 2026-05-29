@@ -22,7 +22,7 @@ class YTProWebChromeClient(private val activity: MainActivity, private val web: 
     private var mOriginalSystemUiVisibility = 0
 
     override fun getDefaultVideoPoster(): Bitmap? {
-        return BitmapFactory.decodeResource(activity.applicationContext.resources, 2130837573)
+        return null
     }
 
     override fun onShowCustomView(paramView: View, viewCallback: CustomViewCallback) {
@@ -47,6 +47,7 @@ class YTProWebChromeClient(private val activity: MainActivity, private val web: 
         }
 
         mCustomView = paramView
+        @Suppress("DEPRECATION")
         mOriginalSystemUiVisibility = activity.window.decorView.systemUiVisibility
 
         // 2. Set the activity to full screen orientation (Landscape usually)
@@ -59,6 +60,7 @@ class YTProWebChromeClient(private val activity: MainActivity, private val web: 
         (activity.window.decorView as FrameLayout).addView(mCustomView, FrameLayout.LayoutParams(-1, -1))
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            @Suppress("DEPRECATION")
             activity.window.setDecorFitsSystemWindows(false)
             activity.window.insetsController?.let { controller ->
                 controller.hide(WindowInsets.Type.statusBars() or WindowInsets.Type.navigationBars())
@@ -87,6 +89,7 @@ class YTProWebChromeClient(private val activity: MainActivity, private val web: 
         mCustomView = null
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            @Suppress("DEPRECATION")
             activity.window.setDecorFitsSystemWindows(true)
             activity.window.insetsController?.show(WindowInsets.Type.statusBars() or WindowInsets.Type.navigationBars())
         } else {
